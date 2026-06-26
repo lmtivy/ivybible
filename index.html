@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1A1208">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>圣经 · Bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 顶栏 -->
+<div id="topbar">
+  <h1 id="topbar-title">圣经 · Holy Bible</h1>
+  <button id="btn-home"    onclick="app.goHome()"      style="display:none">📖</button>
+  <button id="btn-sr-icon" onclick="app.showSearch()"  title="搜索">🔍</button>
+  <button id="btn-bm-icon" onclick="app.showBookmarks()" title="收藏">🔖</button>
+</div>
+
+<!-- 主内容 -->
+<div id="main">
+
+  <!-- 屏幕1：书卷 -->
+  <div id="screen-book" class="screen active">
+    <div class="testament-label">旧约 · Old Testament</div>
+    <div class="book-grid" id="ot-grid"></div>
+    <div class="testament-label">新约 · New Testament</div>
+    <div class="book-grid" id="nt-grid"></div>
+  </div>
+
+  <!-- 屏幕2：章节 -->
+  <div id="screen-chapter" class="screen">
+    <div id="chapter-title"></div>
+    <div class="chapter-grid" id="chapter-grid"></div>
+  </div>
+
+  <!-- 屏幕3：阅读器 -->
+  <div id="screen-reader" class="screen">
+    <div id="reader-nav">
+      <button class="nav-btn" id="btn-prev" onclick="app.changeChapter(-1)">◀ 上章</button>
+      <button class="nav-btn" id="btn-chap-label" onclick="app.showChapters()">第1章</button>
+      <button class="nav-btn" id="btn-next" onclick="app.changeChapter(1)">下章 ▶</button>
+      <button class="nav-btn" id="btn-bookmark" onclick="app.toggleBookmark()" style="flex:0;padding:8px 12px">☆</button>
+    </div>
+    <div id="version-bar">
+      <div class="version-sel-wrap">
+        <label>左侧版本</label>
+        <select id="sel-left"></select>
+      </div>
+      <div class="version-sel-wrap">
+        <label>右侧版本</label>
+        <select id="sel-right"></select>
+      </div>
+    </div>
+    <div id="error-msg"></div>
+    <div id="verses-container"></div>
+  </div>
+
+  <!-- 屏幕4：书签 -->
+  <div id="screen-bookmark" class="screen">
+    <div id="bookmark-list"></div>
+  </div>
+
+  <!-- 屏幕5：搜索 -->
+  <div id="screen-search" class="screen">
+    <div id="search-bar">
+      <input id="search-input" type="search" placeholder="输入关键词…"
+        onkeydown="if(event.key==='Enter') app.runSearch()">
+      <button id="btn-search-run" onclick="app.runSearch()">搜索</button>
+    </div>
+    <div id="search-progress"></div>
+    <div id="search-results"></div>
+  </div>
+
+</div>
+
+<!-- 加载遮罩 -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div>加载中…</div>
+</div>
+
+<script type="module">
+  import * as app from './js/app.js';
+  window.app = app;   // 挂到 window 供 HTML onclick 调用
+  app.init();
+</script>
+</body>
+</html>

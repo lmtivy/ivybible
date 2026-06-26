@@ -1,0 +1,274 @@
+/* ── 变量 ─────────────────────────────────────────────────────────────── */
+:root {
+  --ink:    #1A1208;
+  --faded:  #5C4A30;
+  --accent: #8B1A1A;
+  --gold:   #C8952A;
+  --page:   #F5EFE0;
+  --cream:  #EDE4CC;
+  --rule:   #C8B89A;
+  --shadow: rgba(44,31,14,.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  background: var(--ink);
+  min-height: 100dvh;
+  color: var(--ink);
+  overscroll-behavior: none;
+}
+
+/* ── 顶栏 ────────────────────────────────────────────────────────────── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+#topbar h1 {
+  font-family: 'IM Fell English', Georgia, serif;
+  color: var(--gold);
+  font-size: 1rem;
+  letter-spacing: .04em;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#topbar button {
+  background: none; border: 1px solid #555;
+  color: #ccc; border-radius: 6px;
+  padding: 5px 10px; font-size: .78rem;
+  font-family: inherit; cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+#topbar button:active { opacity: .7; }
+
+/* ── 主内容区 ────────────────────────────────────────────────────────── */
+#main {
+  padding-top: calc(46px + max(10px, env(safe-area-inset-top)));
+  min-height: 100dvh;
+  background: var(--page);
+}
+
+/* ── 通用屏幕 ────────────────────────────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── 书卷列表 ────────────────────────────────────────────────────────── */
+#screen-book { padding: 14px 14px 60px; }
+
+.testament-label {
+  font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 5px; margin: 18px 0 10px;
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.book-btn {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 9px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.book-btn:active { background: #D9CCAA; }
+.book-btn .zh { font-size: .82rem; color: var(--ink); font-weight: 600; display: block; }
+.book-btn .en { font-size: .6rem; color: var(--faded); display: block; margin-top: 2px;
+  font-family: 'IM Fell English', serif; font-style: italic; }
+
+/* ── 章节列表 ────────────────────────────────────────────────────────── */
+#screen-chapter { padding: 14px 14px 60px; }
+#chapter-title { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: 14px; }
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.chap-btn {
+  aspect-ratio: 1;
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  font-size: .9rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.chap-btn:active { background: #D9CCAA; }
+
+/* ── 阅读器 ──────────────────────────────────────────────────────────── */
+#screen-reader { padding: 0 0 80px; }
+
+#reader-nav {
+  display: flex; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--page);
+  position: sticky; top: calc(46px + max(10px, env(safe-area-inset-top)));
+  z-index: 10;
+}
+.nav-btn {
+  flex: 1; padding: 8px 4px;
+  background: var(--cream); border: 1px solid var(--rule);
+  border-radius: 8px; font-family: inherit; font-size: .8rem;
+  cursor: pointer; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn:active { background: #D9CCAA; }
+.nav-btn:disabled { opacity: .35; cursor: default; }
+
+/* 版本选择器 */
+#version-bar {
+  display: flex; gap: 8px;
+  padding: 8px 14px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--rule);
+}
+.version-sel-wrap {
+  flex: 1; display: flex; flex-direction: column; gap: 3px;
+}
+.version-sel-wrap label { font-size: .65rem; color: var(--faded); }
+.version-sel-wrap select {
+  font-family: inherit; font-size: .8rem;
+  background: var(--page); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 5px 6px; color: var(--ink);
+  width: 100%;
+}
+
+/* 经节 */
+#verses-container { padding: 4px 14px 20px; }
+
+.verse-block {
+  display: flex; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #E2D9C5;
+  align-items: flex-start;
+}
+.verse-num {
+  font-family: 'IM Fell English', serif;
+  font-size: .78rem;
+  color: var(--accent);
+  min-width: 22px;
+  padding-top: 3px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.verse-texts { flex: 1; }
+.verse-left {
+  font-size: .95rem;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.verse-right {
+  font-family: 'IM Fell English', serif;
+  font-size: .88rem;
+  line-height: 1.65;
+  color: var(--faded);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── 书签列表 ────────────────────────────────────────────────────────── */
+#screen-bookmark { padding: 14px 14px 60px; }
+
+.bookmark-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+  gap: 10px;
+}
+.bm-label { font-size: .9rem; color: var(--ink); flex: 1; }
+.bm-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.bm-go, .bm-del {
+  font-family: inherit; font-size: .78rem;
+  border-radius: 6px; padding: 5px 10px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bm-go  { background: var(--accent); color: #fff; border: none; }
+.bm-del { background: transparent; color: var(--faded); border: 1px solid var(--rule); }
+.bm-go:active  { opacity: .8; }
+.bm-del:active { opacity: .6; }
+
+.empty-tip { font-size: .88rem; color: var(--faded); margin-top: 20px; line-height: 1.7; }
+
+/* ── 搜索 ────────────────────────────────────────────────────────────── */
+#screen-search { padding: 14px 14px 60px; }
+
+#search-bar {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+#search-input {
+  flex: 1; font-family: inherit; font-size: .9rem;
+  padding: 9px 12px;
+  border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--cream); color: var(--ink);
+}
+#search-input:focus { outline: 2px solid var(--accent); }
+#btn-search-run {
+  font-family: inherit; font-size: .85rem;
+  padding: 9px 14px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 8px; cursor: pointer;
+}
+#btn-search-run:disabled { opacity: .5; }
+
+#search-progress { font-size: .8rem; color: var(--faded); margin-bottom: 10px; min-height: 1.4em; }
+
+.search-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #E2D9C5;
+  cursor: pointer;
+}
+.search-item:active { background: var(--cream); }
+.sr-ref  { font-size: .75rem; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
+.sr-text { font-size: .88rem; line-height: 1.65; color: var(--ink); }
+.sr-text mark { background: #FFEAA0; color: inherit; border-radius: 2px; }
+
+/* ── 加载 / 错误 ─────────────────────────────────────────────────────── */
+#loading {
+  display: none;
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(245,239,224,.88);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  font-size: .9rem; color: var(--faded);
+}
+#loading.show { display: flex; }
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--rule);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#error-msg {
+  display: none;
+  margin: 20px 14px;
+  padding: 14px;
+  background: #FFF0F0;
+  border: 1px solid #C88;
+  border-radius: 8px;
+  font-size: .85rem;
+  color: #922;
+  line-height: 1.6;
+}
+#error-msg.show { display: block; }
+
+/* ── 滚动条 ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
