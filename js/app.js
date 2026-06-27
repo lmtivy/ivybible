@@ -5,7 +5,7 @@ import { search } from './search.js';
 
 // ── 状态 ──────────────────────────────────────────────────────────────────
 const state = {
-  screen: 'book',          // book | chapter | reader | bookmark | search
+  screen: 'book',          // book | reader | bookmark | search
   book: null,
   chapter: 1,
   leftVersion:  DEFAULT_LEFT,
@@ -20,25 +20,30 @@ function $(id) { return document.getElementById(id); }
 
 function show(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  $(screenId).classList.add('active');
+  const el = $(screenId);
+  if (el) el.classList.add('active');
   window.scrollTo(0, 0);
   state.screen = screenId.replace('screen-', '');
 }
 
 function setLoading(v) {
-  $('loading').classList.toggle('show', v);
+  const el = $('loading');
+  if (el) el.classList.toggle('show', v);
 }
 
 function setError(msg) {
   const el = $('error-msg');
-  el.innerHTML = msg;
-  el.classList.toggle('show', !!msg);
+  if (el) {
+    el.innerHTML = msg;
+    el.classList.toggle('show', !!msg);
+  }
 }
 
 // ── 版本选择器 ────────────────────────────────────────────────────────────
 function buildVersionSelectors() {
   ['left', 'right'].forEach(side => {
     const sel = $(`sel-${side}`);
+    if (!sel) return;
     sel.innerHTML = '';
     VERSIONS.forEach(v => {
       const opt = document.createElement('option');
@@ -59,6 +64,7 @@ function buildVersionSelectors() {
 function buildBookList() {
   ['ot', 'nt'].forEach(t => {
     const grid = $(`${t}-grid`);
+    if (!grid) return;
     grid.innerHTML = '';
     BOOKS.filter(b => b.t === t).forEach(b => {
       const btn = document.createElement('button');
@@ -72,24 +78,7 @@ function buildBookList() {
 
 function selectBook(book) {
   state.book = book;
-  state.chapter = 1;
-  $('chapter-title').textContent = `${book.zh}  ·  ${book.en}`;
-  buildChapterGrid(book);
-  show('screen-chapter');
-  updateTopbar();
-}
-
-// ── 章节列表 ──────────────────────────────────────────────────────────────
-function buildChapterGrid(book) {
-  const grid = $('chapter-grid');
-  grid.innerHTML = '';
-  for (let i = 1; i <= book.chapters; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'chap-btn';
-    btn.textContent = i;
-    btn.onclick = () => loadReader(i);
-    grid.appendChild(btn);
-  }
+  loadReader(1);
 }
 
 // ── 阅读器 ────────────────────────────────────────────────────────────────
@@ -101,7 +90,9 @@ export async function loadReader(chapter) {
   updateTopbar();
   updateReaderNav();
   updateBookmarkBtn();
-  $('verses-container').innerHTML = '';
+
+  const container = $('verses-container');
+  if (container) container.innerHTML = '';
 
   try {
     const [leftVerses, rightVerses] = await Promise.all([
@@ -122,16 +113,12 @@ export async function loadReader(chapter) {
   }
 }
 
-async function renderVerses() {
-  setLoading(true);
-  setError('');
-  const [leftVerses, rightVerses] = await Promise.all([
-    loadChapter(state.leftVersion,  state.book.file, state.chapter),
-    loadChapter(state.rightVersion, state.book.file, state.chapter),
-  ]);
-  setLoading(false);
+function renderVerses(explicitLeft, explicitRight) {
+  let leftVerses = explicitLeft;
+  let rightVerses = explicitRight;
 
   const container = $('verses-container');
+  if (!container) return;
   container.innerHTML = '';
 
   const allNums = new Set([
@@ -154,13 +141,33 @@ async function renderVerses() {
       </div>`;
     container.appendChild(block);
   });
+
+  // 渲染右侧章节快捷侧边栏
+  const sidebar = $('right-chapter-sidebar');
+  if (sidebar && state.book) {
+    sidebar.innerHTML = '';
+    for (let i = 1; i <= state.book.chapters; i++) {
+      const btn = document.createElement('button');
+      btn.className = `sidebar-btn ${i === state.chapter ? 'active' : ''}`;
+      btn.textContent = i;
+      btn.onclick = () => loadReader(i);
+      sidebar.appendChild(btn);
+    }
+    // 自动平滑滚动当前高亮章到侧边栏正中
+    const activeBtn = sidebar.querySelector('.sidebar-btn.active');
+    activeBtn?.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+  }
 }
 
 function updateReaderNav() {
   const { book, chapter } = state;
-  $('btn-prev').disabled  = chapter <= 1;
-  $('btn-next').disabled  = chapter >= book.chapters;
-  $('btn-chap-label').textContent = `第 ${chapter} 章`;
+  const btnPrev = $('btn-prev');
+  const btnNext = $('btn-next');
+  const label = $('btn-chap-label');
+
+  if (btnPrev) btnPrev.disabled  = chapter <= 1;
+  if (btnNext) btnNext.disabled  = chapter >= book.chapters;
+  if (label) label.textContent = `第 ${chapter} 章`;
 }
 
 export function changeChapter(delta) {
@@ -170,13 +177,13 @@ export function changeChapter(delta) {
 }
 
 export function showChapters() {
-  show('screen-chapter');
-  updateTopbar();
+  goHome();
 }
 
 // ── 书签按钮 ──────────────────────────────────────────────────────────────
 function updateBookmarkBtn() {
   const btn = $('btn-bookmark');
+  if (!btn) return;
   const saved = hasBookmark(state.book.id, state.chapter);
   btn.textContent = saved ? '★' : '☆';
   btn.title = saved ? '取消收藏' : '收藏本章';
@@ -191,7 +198,6 @@ export function toggleBookmark() {
     addBookmark(book.id, chapter, label);
   }
   updateBookmarkBtn();
-  // 如果书签列表正在显示，刷新它
   if ($('screen-bookmark').classList.contains('active')) renderBookmarks();
 }
 
@@ -205,6 +211,7 @@ export function showBookmarks() {
 function renderBookmarks() {
   const list = getBookmarks();
   const container = $('bookmark-list');
+  if (!container) return;
   if (!list.length) {
     container.innerHTML = '<p class="empty-tip">还没有收藏。阅读时点右上角 ☆ 收藏章节。</p>';
     return;
@@ -237,11 +244,14 @@ function renderBookmarks() {
 export function showSearch() {
   show('screen-search');
   updateTopbar();
-  $('search-input').focus();
+  const input = $('search-input');
+  if (input) input.focus();
 }
 
 export async function runSearch() {
-  const q = $('search-input').value.trim();
+  const input = $('search-input');
+  if (!input) return;
+  const q = input.value.trim();
   if (!q || state.searchRunning) return;
 
   state.searchQuery = q;
@@ -250,7 +260,6 @@ export async function runSearch() {
   $('search-progress').textContent = '搜索中…';
   $('btn-search-run').disabled = true;
 
-  // 只搜左侧版本
   const results = await search(state.leftVersion, q, (i, total) => {
     const pct = Math.round((i / total) * 100);
     $('search-progress').textContent = `搜索中… ${pct}%`;
@@ -268,8 +277,9 @@ export async function runSearch() {
 
 function renderSearchResults(results) {
   const container = $('search-results');
+  if (!container) return;
   container.innerHTML = '';
-  results.slice(0, 200).forEach(r => {  // 最多显示200条
+  results.slice(0, 200).forEach(r => {
     const item = document.createElement('div');
     item.className = 'search-item';
     item.innerHTML = `
@@ -278,7 +288,6 @@ function renderSearchResults(results) {
     item.onclick = () => {
       state.book = r.book;
       loadReader(r.chapter).then(() => {
-        // 跳到对应节
         const el = document.querySelector(`[data-verse="${r.verse}"]`);
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
@@ -292,15 +301,11 @@ function updateTopbar() {
   const { screen, book, chapter } = state;
   const title = $('topbar-title');
   const btnHome = $('btn-home');
-  const btnBm   = $('btn-bm-icon');
-  const btnSr   = $('btn-sr-icon');
+  if (!title || !btnHome) return;
 
   if (screen === 'book') {
     title.textContent = '圣经 · Holy Bible';
     btnHome.style.display = 'none';
-  } else if (screen === 'chapter') {
-    title.textContent = book?.zh ?? '';
-    btnHome.style.display = '';
   } else if (screen === 'reader') {
     title.textContent = `${book?.zh} 第${chapter}章`;
     btnHome.style.display = '';

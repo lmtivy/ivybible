@@ -87,27 +87,6 @@ body {
 .book-btn .en { font-size: .6rem; color: var(--faded); display: block; margin-top: 2px;
   font-family: 'IM Fell English', serif; font-style: italic; }
 
-/* ── 章节列表 ────────────────────────────────────────────────────────── */
-#screen-chapter { padding: 14px 14px 60px; }
-#chapter-title { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: 14px; }
-.chapter-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-}
-.chap-btn {
-  aspect-ratio: 1;
-  background: var(--cream);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  font-size: .9rem;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-}
-.chap-btn:active { background: #D9CCAA; }
-
 /* ── 阅读器 ──────────────────────────────────────────────────────────── */
 #screen-reader { padding: 0 0 80px; }
 
@@ -147,37 +126,72 @@ body {
   width: 100%;
 }
 
-/* 经节 */
-#verses-container { padding: 4px 14px 20px; }
-
+/* 对比阅读器经文单行排版 */
 .verse-block {
   display: flex; gap: 10px;
-  padding: 10px 0;
+  padding: 12px 14px;
   border-bottom: 1px solid #E2D9C5;
   align-items: flex-start;
 }
 .verse-num {
-  font-family: 'IM Fell English', serif;
-  font-size: .78rem;
-  color: var(--accent);
-  min-width: 22px;
-  padding-top: 3px;
-  flex-shrink: 0;
-  text-align: right;
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.75rem; font-weight: 600; color: var(--accent);
+  min-width: 20px; padding-top: 3px;
 }
-.verse-texts { flex: 1; }
-.verse-left {
-  font-size: .95rem;
-  line-height: 1.75;
-  color: var(--ink);
+.verse-texts { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.verse-left { font-size: 0.95rem; line-height: 1.7; color: var(--ink); }
+.verse-right { font-size: 0.92rem; line-height: 1.65; color: var(--faded); }
+
+/* ── 全新阅读器双栏布局 ── */
+.reader-layout {
+  display: flex;
+  position: relative;
+  width: 100%;
 }
-.verse-right {
-  font-family: 'IM Fell English', serif;
-  font-size: .88rem;
-  line-height: 1.65;
+
+#verses-container {
+  flex: 1;
+  padding: 4px 42px 20px 0; /* 右边垫出安全区，防止文字被固定的侧边栏挡住 */
+}
+
+/* 固定挂载到最右侧的独立章节列表 */
+#right-chapter-sidebar {
+  position: fixed;
+  right: 0;
+  top: calc(105px + max(10px, env(safe-area-inset-top)));
+  bottom: 0;
+  width: 36px;
+  background: var(--cream);
+  border-left: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  z-index: 99;
+}
+
+.sidebar-btn {
+  width: 100%;
+  padding: 11px 0;
+  background: transparent;
+  border: none;
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.88rem;
   color: var(--faded);
-  margin-top: 4px;
-  font-style: italic;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar-btn:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+.sidebar-btn.active {
+  background: #D9CCAA;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* ── 书签列表 ────────────────────────────────────────────────────────── */
