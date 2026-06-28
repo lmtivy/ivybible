@@ -118,11 +118,10 @@ body {
   display: block;
 }
 .book-btn .en {
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   color: var(--faded);
   display: block;
   margin-top: 2px;
-  font-style: italic;
 }
 
 /* ── 阅读器 ──────────────────────────────────────────────────────────── */
